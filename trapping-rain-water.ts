@@ -8,35 +8,51 @@ import {
 function trap(height: number[]): number {
   let total = 0;
   let highestToLeft = 0;
-  let potentiallyTrapped = 0;
-  while (height.length) {
-    const columnHeight: number = height.shift()!;
-    const highestToRight = Math.max(...height); // This is slow > 70ms, move it???
-    const minHeight = Math.min(highestToLeft, highestToRight);
-    if (columnHeight < minHeight) {
-      const amountTrapped = minHeight - columnHeight;
-      potentiallyTrapped += amountTrapped;
-    } else {
-      highestToLeft = Math.max(columnHeight, highestToLeft);
-      total += potentiallyTrapped;
-      potentiallyTrapped = 0;
-    }
+  let highestToRight = 0;
+  let rightIndex = height.length - 1;
+  let leftIndex = 0;
+  let distanceBetweenLeftAndRight = height.length - 2;
+  let currentFillLevel = 0;
+  while (leftIndex < rightIndex) {
+    const leftSquare = height[leftIndex];
+    const rightSquare = height[rightIndex];
+    const minHeightBetweenThetwo = Math.min(leftSquare, rightSquare);
+    currentFillLevel = Math.max(currentFillLevel, minHeightBetweenThetwo);
+
+    // trapped
+    const trapped = minHeightBetweenThetwo * distanceBetweenLeftAndRight;
+    total += trapped;
+
+    highestToLeft = Math.max(highestToLeft, leftSquare);
+    highestToRight = Math.max(highestToRight, rightSquare);
+
+    leftIndex++;
+    rightIndex--;
+    distanceBetweenLeftAndRight -= 2;
   }
   return total;
 }
+
+Deno.test("[1,2,1]", () => {
+  const result = trap([1, 2, 1]);
+  assertEquals(result, 0);
+});
 
 Deno.test("[5,0,1,2,3,2,5]", () => {
   const result = trap([5, 0, 1, 2, 3, 2, 5]);
   assertEquals(result, 17);
 });
+
 Deno.test("[5,0,1,2,3,2,1]", () => {
   const result = trap([5, 0, 1, 2, 3, 2, 1]);
   assertEquals(result, 6);
 });
+
 Deno.test("0,1,0", () => {
   const result = trap([0, 1, 0]);
   assertEquals(result, 0);
 });
+
 Deno.test("[1,0,1]", () => {
   const result = trap([1, 0, 1]);
   assertEquals(result, 1);
