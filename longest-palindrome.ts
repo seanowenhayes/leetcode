@@ -3,60 +3,48 @@ import {
   assertLess,
 } from "https://deno.land/std@0.224.0/assert/mod.ts";
 
-function isAPalindrome(maybeAPalindrome: string): boolean {
-  let left = 0;
-  let right = maybeAPalindrome.length - 1;
-  while (left <= right) {
-    const leftChar = maybeAPalindrome[left];
-    const rightChar = maybeAPalindrome[right];
-    if (leftChar !== rightChar) {
-      return false;
+function grow(wholeWord: string, [start, end]: [number, number]): string {
+  let firstChar = wholeWord[start];
+  let lastChar = wholeWord[end];
+  while (firstChar === lastChar && start > 0 && end < wholeWord.length) {
+    if (wholeWord[start - 1] === wholeWord[end + 1]) {
+      start -= 1;
+      end += 1;
+    } else {
+      break;
     }
-    left++;
-    right--;
   }
-  return true;
+  return wholeWord.substring(start, end + 1);
 }
-
 function longestPalindrome(s: string): string {
   if (s.length < 2) {
     return s;
   }
-  if (isAPalindrome(s)) {
-    return s;
+  // worst case the longest palindrome is a single letter
+  let longestPalindrome = s[0];
+  for (let i = 0; i < s.length - 1; i++) {
+    if (s[i] === s[i + 1]) {
+      const palindrome = grow(s, [i, i + 1]);
+      if (palindrome.length > longestPalindrome.length) {
+        longestPalindrome = palindrome;
+      }
+    }
+
+    if (s[i] === s[i + 2]) {
+      const palindrome = grow(s, [i, i + 2]);
+      if (palindrome.length > longestPalindrome.length) {
+        longestPalindrome = palindrome;
+      }
+    }
   }
-  const right = s.substring(1);
-  const left = s.substring(0, s.length - 1);
-  const longestLeft = longestPalindrome(left);
-  const longestRight = longestPalindrome(right);
-  return longestLeft.length > longestRight.length ? longestLeft : longestRight;
+
+  return longestPalindrome;
 }
-
-Deno.test("Should return true given a palindrome", () => {
-  const palidromes = ["otto", "bob", "racecar"];
-  palidromes.forEach((palindrome) => {
-    const output = isAPalindrome(palindrome);
-    assertEquals(output, true);
-  });
-});
-
-Deno.test("Should return false given a non palindrome", () => {
-  const palidromes = [
-    "seanowenhayes",
-    "borichardgeatb",
-    "jennypowell",
-    "babad",
-  ];
-  palidromes.forEach((palindrome) => {
-    const output = isAPalindrome(palindrome);
-    assertEquals(output, false);
-  });
-});
 
 Deno.test("babad", () => {
   const input = "babad";
   const output = longestPalindrome(input);
-  assertEquals(output, "aba");
+  assertEquals(output, "bab");
 });
 
 Deno.test("cbbd", () => {
@@ -65,17 +53,32 @@ Deno.test("cbbd", () => {
   assertEquals(output, "bb");
 });
 
-Deno.test("Is a palindrome should be faster", () => {
-  const beforePalindromeMakrer = "before palindrome test mark";
-  const afterPalindromeMarker = "after palindrome test mark";
-  performance.mark(beforePalindromeMakrer);
-  isAPalindrome("abbcccbbbcaaccbababcbcabca");
-  performance.mark(afterPalindromeMarker);
-  const measure = performance.measure(
-    "palindrome teset performance",
-    beforePalindromeMakrer,
-    afterPalindromeMarker,
-  );
-  console.log(`It took ${measure.duration} ms's to do the palindrome test`);
-  assertLess(measure.duration, 0.2);
+Deno.test("bb", () => {
+  const input = "bb";
+  const output = longestPalindrome("bb");
+  assertEquals(output, "bb");
+});
+
+Deno.test("aaaa", () => {
+  const input = "aaaa";
+  const output = longestPalindrome(input);
+  assertEquals(output, "aaaa");
+});
+
+Deno.test("aaa", () => {
+  const input = "aaa";
+  const output = longestPalindrome(input);
+  assertEquals(output, "aaa");
+});
+
+Deno.test("aaaaa", () => {
+  const input = "aaaaa";
+  const output = longestPalindrome(input);
+  assertEquals(output, "aaaaa");
+});
+
+Deno.test("aaaaaa", () => {
+  const input = "aaaaaa";
+  const output = longestPalindrome(input);
+  assertEquals(output, "aaaaaa");
 });
