@@ -5,32 +5,34 @@ import {
 
 // https://leetcode.com/problems/trapping-rain-water
 
+type MaxLeft = { maxLeft: number };
+type ColumnHeight = { columnHeight: number };
+
 function trap(height: number[]): number {
-  let total = 0;
-  let highestToLeft = 0;
-  let highestToRight = 0;
-  let rightIndex = height.length - 1;
-  let leftIndex = 0;
-  let distanceBetweenLeftAndRight = height.length - 2;
-  let currentFillLevel = 0;
-  while (leftIndex < rightIndex) {
-    const leftSquare = height[leftIndex];
-    const rightSquare = height[rightIndex];
-    const minHeightBetweenThetwo = Math.min(leftSquare, rightSquare);
-    currentFillLevel = Math.max(currentFillLevel, minHeightBetweenThetwo);
+  let trappedWater = 0;
 
-    // trapped
-    const trapped = minHeightBetweenThetwo * distanceBetweenLeftAndRight;
-    total += trapped;
-
-    highestToLeft = Math.max(highestToLeft, leftSquare);
-    highestToRight = Math.max(highestToRight, rightSquare);
-
-    leftIndex++;
-    rightIndex--;
-    distanceBetweenLeftAndRight -= 2;
+  let maxLeft = 0;
+  const itemsWithMaxLeft: Array<MaxLeft & ColumnHeight> = [];
+  // mark each item with max left
+  for (let i = 0; i < height.length; i++) {
+    const columnHeight = height[i];
+    const columnData = { maxLeft, columnHeight };
+    itemsWithMaxLeft.push(columnData);
+    maxLeft = Math.max(maxLeft, columnHeight);
   }
-  return total;
+
+  let maxRight = 0;
+  // mark each item with max right
+  for (let i = height.length - 1; i >= 0; i--) {
+    const { columnHeight, maxLeft } = itemsWithMaxLeft[i];
+    const volumeTrapped = Math.min(maxLeft, maxRight) - columnHeight;
+    if (volumeTrapped > 0) {
+      trappedWater += volumeTrapped;
+    }
+    maxRight = Math.max(maxRight, columnHeight);
+  }
+
+  return trappedWater;
 }
 
 Deno.test("[1,2,1]", () => {
