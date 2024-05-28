@@ -2,14 +2,20 @@ import { assertEquals } from "https://deno.land/std@0.224.0/assert/mod.ts";
 
 function maxArea(height: number[]): number {
   let maxArea = 0;
-  for (let left = 0; left < height.length; left++) {
-    for (let right = left + 1; right < height.length; right++) {
-      const leftHeight = height[left];
-      const rightHeight = height[right];
-      const distance = right - left;
-      const minHeight = Math.min(leftHeight, rightHeight);
-      const area = minHeight * distance;
-      maxArea = Math.max(area, maxArea);
+  let leftPointer = 0;
+  let rightPointer = height.length - 1;
+
+  while (leftPointer < rightPointer) {
+    const leftHeight = height[leftPointer];
+    const rightHeight = height[rightPointer];
+    const distance = rightPointer - leftPointer;
+    const minHeight = Math.min(leftHeight, rightHeight);
+    const area = minHeight * distance;
+    maxArea = Math.max(area, maxArea);
+    if (leftHeight > rightHeight) {
+      rightPointer--;
+    } else {
+      leftPointer++;
     }
   }
   return maxArea;
