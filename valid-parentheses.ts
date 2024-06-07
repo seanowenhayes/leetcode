@@ -2,55 +2,47 @@
 
 import { assertEquals } from "https://deno.land/std@0.224.0/assert/mod.ts";
 
+type Opening = "(" | "[" | "{";
+const openeningParen: Opening = "(";
+const openingSquareBracket: Opening = "[";
+const openingCurlyBracket: Opening = "{";
+
+type Closing = ")" | "]" | "}";
+const closingParen: Closing = ")";
+const closingSquareBracket: Closing = "]";
+const closingCurlyBracket: Closing = "}";
+
 function isValid(s: string): boolean {
-  const openeningParen = "(";
-  const openingSquareBracket = "[";
-  const openingCurlyBracket = "{";
+  const lastOpenedTag: Array<Opening> = [];
 
-  const closingParen = ")";
-  const closingSquareBracket = "]";
-  const closingCurlyBracket = "}";
+  const compliments: Map<Opening, Closing> = new Map(
+    [
+      [openeningParen, closingParen],
+      [openingSquareBracket, closingSquareBracket],
+      [openingCurlyBracket, closingCurlyBracket],
+    ],
+  );
 
-  let parenScore = 0;
-  let squareScore = 0;
-  let curlyScore = 0;
   for (let i = 0; i < s.length; i++) {
     const character = s[i];
     switch (character) {
-      case openeningParen: {
-        parenScore += 1;
-        break;
-      }
-      case openingSquareBracket: {
-        squareScore += 1;
-        break;
-      }
+      case openeningParen:
+      case openingSquareBracket:
       case openingCurlyBracket: {
-        curlyScore += 1;
+        lastOpenedTag.push(character);
         break;
       }
-      case closingParen: {
-        if (parenScore === 0) {
-          // more closing than proceediung parens can't be valid
-          return false;
-        }
-        parenScore -= 1;
-        break;
-      }
-      case closingSquareBracket: {
-        if (squareScore === 0) {
-          // more closing than opening
-          return false;
-        }
-        squareScore -= 1;
-        break;
-      }
+      case closingParen:
+      case closingSquareBracket:
       case closingCurlyBracket: {
-        if (curlyScore === 0) {
-          // more closing than opening can't be valid
+        const openedTag = lastOpenedTag.pop();
+        if (openedTag === undefined) {
           return false;
         }
-        curlyScore -= 1;
+        const lastOpenedCompliment = compliments.get(openedTag);
+        if (lastOpenedCompliment !== character) {
+          return false;
+        }
         break;
       }
       default:
@@ -59,8 +51,16 @@ function isValid(s: string): boolean {
         );
     }
   }
-  return parenScore === 0 && squareScore === 0 && curlyScore === 0;
+  return lastOpenedTag.length === 0;
 }
+
+Deno.test("[ => false", () => {
+  const input = "[";
+  assertEquals(
+    isValid("["),
+    false,
+  );
+});
 
 Deno.test("() => true", () => {
   assertEquals(
@@ -84,4 +84,7 @@ Deno.test("()", () => {
 
 Deno.test("(] => false", () => {
   assertEquals(isValid("(]"), false);
+});
+
+Deno.test("([)]", () => {
 });
