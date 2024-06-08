@@ -1,28 +1,18 @@
 import { assertEquals } from "https://deno.land/std@0.224.0/assert/mod.ts";
 
 function rob(nums: number[]): number {
-  if (nums.length < 3) {
-    return Math.max(...nums);
-  }
-  let maxHaul = 0;
-  let midPointer = 1;
-  while (midPointer < nums.length + 1) {
-    const leftPointer = midPointer - 1;
-    const rightPointer = midPointer + 1;
-    const numLeft = nums[leftPointer] ?? 0;
-    const numMid = nums[midPointer] ?? 0;
-    const numRight = nums[rightPointer] ?? 0;
-    const middle = numMid >= numLeft + numRight;
-    if (middle) {
-      maxHaul += numMid;
-      midPointer += 3;
+  let robEven = 0;
+  let robOdd = 0;
+
+  for (let i = 0; i < nums.length; i++) {
+    if (i % 2 == 0) {
+      robEven = Math.max(robEven + nums[i], robOdd);
     } else {
-      maxHaul += numLeft;
-      maxHaul += numRight;
-      midPointer += 4;
+      robOdd = Math.max(robOdd + nums[i], robEven);
     }
   }
-  return maxHaul;
+
+  return Math.max(robEven, robOdd);
 }
 
 Deno.test("[1,1,1,2]", () => {
