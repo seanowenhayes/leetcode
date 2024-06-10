@@ -3,19 +3,18 @@
 import { assertEquals } from "https://deno.land/std@0.224.0/assert/mod.ts";
 
 function checkSubarraySum(nums: number[], k: number): boolean {
-  function numIsAMultipleOfK(num: number): boolean {
-    return num === 0 || num % k === 0;
-  }
+  const remainderIndexMap: Map<number, number> = new Map([[0, -1]]);
+  let total = 0;
   for (let i = 0; i < nums.length; i++) {
-    let runningTotal = 0;
-    let subArrayLength = 1;
-    for (let j = i; j < nums.length; j++) {
-      const num = nums[j];
-      runningTotal += num;
-      if (subArrayLength > 1 && numIsAMultipleOfK(runningTotal)) {
-        return true;
-      }
-      subArrayLength++;
+    const num = nums[i];
+    total += num;
+    const remainder = total % k;
+    if (
+      !remainderIndexMap.has(remainder)
+    ) {
+      remainderIndexMap.set(remainder, i);
+    } else if (i - remainderIndexMap.get(remainder)! > 1) {
+      return true;
     }
   }
   return false;
@@ -63,14 +62,14 @@ Deno.test("[23,2,4,6,7]", () => {
   assertEquals(output, true);
 });
 
-Deno.test("[23,2,6,4,7]", () => {
+Deno.test("[23,2,6,4,7] k:6 => true", () => {
   const input = [23, 2, 6, 4, 7];
   const k = 6;
   const output = checkSubarraySum(input, k);
   assertEquals(output, true);
 });
 
-Deno.test("[23,2,6,4,7]", () => {
+Deno.test("[23,2,6,4,7] k:13 => false", () => {
   const input = [23, 2, 6, 4, 7];
   const k = 13;
   const output = checkSubarraySum(input, k);
