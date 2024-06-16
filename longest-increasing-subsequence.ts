@@ -3,36 +3,23 @@
 import { assertEquals } from "https://deno.land/std@0.224.0/assert/mod.ts";
 
 function lengthOfLIS(nums: number[]): number {
-  const increasingSequences: Array<Array<number>> = [];
-  increasingSequences.push([nums.shift()!]);
+  const longestSequence = [];
+
+  longestSequence.push(nums[0]);
+
   const numsLength = nums.length;
-  let maxLength = 1;
-  for (let i = 0; i < numsLength; i++) {
+
+  for (let i = 1; i < numsLength; i++) {
     const num = nums[i];
-    increasingSequences.forEach((increasingSequence) => {
-      let lastNum: number | undefined =
-        increasingSequence[increasingSequence.length - 1]!;
-      if (num > lastNum) {
-        increasingSequence.push(num);
-        maxLength = Math.max(
-          maxLength,
-          increasingSequence.length,
-        );
-      } else {
-        const newSequence = [...increasingSequence];
-        while (
-          newSequence.length &&
-          newSequence[newSequence.length - 1]! >= num
-        ) {
-          newSequence.pop();
-        }
-        lastNum = num;
-        newSequence.push(num);
-        increasingSequences.push(newSequence);
-      }
-    });
+    if (num > longestSequence[longestSequence.length - 1]) {
+      longestSequence.push(num);
+    } else {
+      const low = longestSequence.findIndex((el) => el >= num);
+      longestSequence[low] = num;
+    }
   }
-  return maxLength;
+
+  return longestSequence.length;
 }
 
 Deno.test("[4,10,4,3,8,9] => 3", () => {
