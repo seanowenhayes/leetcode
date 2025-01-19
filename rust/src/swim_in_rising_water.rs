@@ -16,13 +16,15 @@ impl Swimmer {
     fn swim(&self, position: (usize, usize), mut visited: HashSet<i32>) -> Option<i32> {
         let (x, y) = position;
         let current = self.grid[x][y];
+        visited.insert(current);
         if x == self.grid_size && y == self.grid_size {
             return Some(current);
         }
-        visited.insert(current);
+
         // up
         let mut up_cost: Option<i32> = None;
-        if y > 0 {
+        // no point going up if we are on the top or right
+        if y > 0 && x < self.grid_size {
             let up_y = y - 1;
             let up = self.grid[x][up_y];
             if !visited.contains(&up) {
@@ -49,7 +51,8 @@ impl Swimmer {
         }
         // left
         let mut left_cost: Option<i32> = None;
-        if x > 0 {
+        // no point going left if we are on the left or bottom
+        if x > 0 && y < self.grid_size {
             let left_x = x - 1;
             let left = self.grid[left_x][y];
             if !visited.contains(&left) {
@@ -156,5 +159,20 @@ mod tests {
         let mut swimmer = Swimmer::new(input);
         let output = swimmer.swim_in_water();
         assert_eq!(output, 14);
+    }
+
+    #[test]
+    fn test_performance() {
+        let input = vec![
+            vec![29, 28, 12, 2, 24, 11],
+            vec![17, 30, 25, 9, 13, 33],
+            vec![1, 0, 34, 35, 23, 19],
+            vec![31, 22, 4, 26, 6, 3],
+            vec![21, 14, 15, 8, 32, 20],
+            vec![5, 18, 7, 27, 16, 10],
+        ];
+        let mut swimmer = Swimmer::new(input);
+        let output = swimmer.swim_in_water();
+        assert_eq!(output, 29);
     }
 }
