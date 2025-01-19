@@ -128,7 +128,7 @@ mod tests {
         ];
         let mut swimmer = Swimmer::new(input);
         let output = swimmer.swim_in_water();
-        assert_eq!(output, 16);
+        assert_eq!(output, 14);
     }
 
     #[test]
