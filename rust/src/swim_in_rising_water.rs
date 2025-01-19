@@ -13,11 +13,11 @@ impl Swimmer {
         Self { grid, grid_size }
     }
 
-    fn swim(&self, position: (usize, usize), mut visited: HashSet<i32>) -> i32 {
+    fn swim(&self, position: (usize, usize), mut visited: HashSet<i32>) -> Option<i32> {
         let (x, y) = position;
         let current = self.grid[x][y];
         if x == self.grid_size && y == self.grid_size {
-            return current;
+            return Some(current);
         }
         visited.insert(current);
         // up
@@ -26,7 +26,7 @@ impl Swimmer {
             let up_y = y - 1;
             let up = self.grid[x][up_y];
             if !visited.contains(&up) {
-                up_cost = Some(self.swim((x, up_y), visited.clone()));
+                up_cost = self.swim((x, up_y), visited.clone());
             }
         }
         // right
@@ -35,7 +35,7 @@ impl Swimmer {
             let right_x = x + 1;
             let right = self.grid[right_x][y];
             if !visited.contains(&right) {
-                right_cost = Some(self.swim((right_x, y), visited.clone()));
+                right_cost = self.swim((right_x, y), visited.clone());
             }
         }
         // down
@@ -44,7 +44,7 @@ impl Swimmer {
             let down_y = y + 1;
             let down = self.grid[x][down_y];
             if !visited.contains(&down) {
-                down_cost = Some(self.swim((x, down_y), visited.clone()));
+                down_cost = self.swim((x, down_y), visited.clone());
             }
         }
         // left
@@ -53,7 +53,7 @@ impl Swimmer {
             let left_x = x - 1;
             let left = self.grid[left_x][y];
             if !visited.contains(&left) {
-                left_cost = Some(self.swim((left_x, y), visited.clone()));
+                left_cost = self.swim((left_x, y), visited.clone());
             }
         }
         let min_swim_costs = vec![up_cost, right_cost, down_cost, left_cost]
@@ -63,16 +63,16 @@ impl Swimmer {
             .min();
         if let Some(min_swim_cost) = min_swim_costs {
             if min_swim_cost > current {
-                return min_swim_cost;
+                return Some(min_swim_cost);
             } else {
-                return current;
+                return Some(current);
             }
         } else {
-            return current;
+            return None;
         }
     }
     pub fn swim_in_water(&mut self) -> i32 {
-        return self.swim((0, 0), HashSet::new());
+        return self.swim((0, 0), HashSet::new()).unwrap();
     }
 }
 
