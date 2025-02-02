@@ -1,4 +1,4 @@
-use std::collections::HashSet;
+use std::{cmp::min, collections::HashSet, i32};
 
 // https://leetcode.com/problems/swim-in-rising-water/description/
 
@@ -59,19 +59,17 @@ impl Swimmer {
                 left_cost = self.swim((left_x, y), visited.clone());
             }
         }
-        let min_swim_costs = vec![up_cost, right_cost, down_cost, left_cost]
-            .iter()
-            .filter(|x| x.is_some())
-            .map(|x| x.unwrap())
-            .min();
-        if let Some(min_swim_cost) = min_swim_costs {
-            if min_swim_cost > current {
-                return Some(min_swim_cost);
-            } else {
-                return Some(current);
-            }
-        } else {
+        let min_swim_costs = min(
+            min(up_cost.unwrap_or(i32::MAX), right_cost.unwrap_or(i32::MAX)),
+            min(down_cost.unwrap_or(i32::MAX), left_cost.unwrap_or(i32::MAX)),
+        );
+        if min_swim_costs == i32::MAX {
             return None;
+        }
+        if min_swim_costs > current {
+            return Some(min_swim_costs);
+        } else {
+            return Some(current);
         }
     }
     pub fn swim_in_water(&mut self) -> i32 {
