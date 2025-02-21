@@ -1,3 +1,5 @@
+use std::cmp::Reverse;
+use std::collections::BinaryHeap;
 use std::{cmp::min, collections::HashSet, i32};
 
 // https://leetcode.com/problems/swim-in-rising-water/description/
@@ -13,67 +15,41 @@ impl Swimmer {
         Self { grid, grid_size }
     }
 
-    fn swim(&self, position: (usize, usize), mut visited: HashSet<i32>) -> Option<i32> {
-        let (x, y) = position;
-        let current = self.grid[x][y];
-        visited.insert(current);
-        if x == self.grid_size && y == self.grid_size {
-            return Some(current);
+    pub fn swim_in_water(&self) -> i32 {
+        let mut heap = BinaryHeap::new();
+        let mut visited = HashSet::new();
+        heap.push(Reverse((self.grid[0][0], 0, 0)));
+
+        let directions = [(0, 1), (1, 0), (0, -1), (-1, 0)];
+
+        while let Some(Reverse((cost, x, y))) = heap.pop() {
+            if x == self.grid_size && y == self.grid_size {
+                return cost;
+            }
+
+            if !visited.insert((x, y)) {
+                continue;
+            }
+
+            for &(dx, dy) in &directions {
+                let nx = x as isize + dx;
+                let ny = y as isize + dy;
+
+                if nx >= 0
+                    && nx <= self.grid_size as isize
+                    && ny >= 0
+                    && ny <= self.grid_size as isize
+                {
+                    let nx = nx as usize;
+                    let ny = ny as usize;
+                    if !visited.contains(&(nx, ny)) {
+                        heap.push(Reverse((cost.max(self.grid[nx][ny]), nx, ny)));
+                    }
+                }
+            }
         }
 
-        // up
-        let mut up_cost: Option<i32> = None;
-        // no point going up if we are on the top or right
-        if y > 0 && x < self.grid_size {
-            let up_y = y - 1;
-            let up = self.grid[x][up_y];
-            if !visited.contains(&up) {
-                up_cost = self.swim((x, up_y), visited.clone());
-            }
-        }
-        // right
-        let mut right_cost: Option<i32> = None;
-        if x < self.grid_size {
-            let right_x = x + 1;
-            let right = self.grid[right_x][y];
-            if !visited.contains(&right) {
-                right_cost = self.swim((right_x, y), visited.clone());
-            }
-        }
-        // down
-        let mut down_cost: Option<i32> = None;
-        if y < self.grid_size {
-            let down_y = y + 1;
-            let down = self.grid[x][down_y];
-            if !visited.contains(&down) {
-                down_cost = self.swim((x, down_y), visited.clone());
-            }
-        }
-        // left
-        let mut left_cost: Option<i32> = None;
-        // no point going left if we are on the left or bottom
-        if x > 0 && y < self.grid_size {
-            let left_x = x - 1;
-            let left = self.grid[left_x][y];
-            if !visited.contains(&left) {
-                left_cost = self.swim((left_x, y), visited.clone());
-            }
-        }
-        let min_swim_costs = min(
-            min(up_cost.unwrap_or(i32::MAX), right_cost.unwrap_or(i32::MAX)),
-            min(down_cost.unwrap_or(i32::MAX), left_cost.unwrap_or(i32::MAX)),
-        );
-        if min_swim_costs == i32::MAX {
-            return None;
-        }
-        if min_swim_costs > current {
-            return Some(min_swim_costs);
-        } else {
-            return Some(current);
-        }
-    }
-    pub fn swim_in_water(&mut self) -> i32 {
-        return self.swim((0, 0), HashSet::new()).unwrap();
+        unreachable!()
     }
 }
 
@@ -169,7 +145,7 @@ mod tests {
             vec![21, 14, 15, 8, 32, 20],
             vec![5, 18, 7, 27, 16, 10],
         ];
-        let mut swimmer = Swimmer::new(input);
+        let swimmer = Swimmer::new(input);
         let output = swimmer.swim_in_water();
         assert_eq!(output, 29);
     }
