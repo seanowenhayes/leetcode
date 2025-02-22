@@ -1,6 +1,6 @@
 use std::cmp::Reverse;
 use std::collections::BinaryHeap;
-use std::{cmp::min, collections::HashSet, i32};
+use std::{collections::HashSet, i32};
 
 // https://leetcode.com/problems/swim-in-rising-water/description/
 
@@ -60,7 +60,7 @@ mod tests {
     #[test]
     fn test_example() {
         let input = vec![vec![0, 2], vec![1, 3]];
-        let mut swimmer = Swimmer::new(input);
+        let swimmer = Swimmer::new(input);
         let output = swimmer.swim_in_water();
         assert_eq!(output, 3);
     }
@@ -68,7 +68,7 @@ mod tests {
     #[test]
     fn test_single_grid_zero() {
         let input = vec![vec![0]];
-        let mut swimmer = Swimmer::new(input);
+        let swimmer = Swimmer::new(input);
         let output = swimmer.swim_in_water();
         assert_eq!(output, 0);
     }
@@ -76,7 +76,7 @@ mod tests {
     #[test]
     fn test_single_grid_7() {
         let input = vec![vec![7]];
-        let mut swimmer = Swimmer::new(input);
+        let swimmer = Swimmer::new(input);
         let output = swimmer.swim_in_water();
         assert_eq!(output, 7);
     }
@@ -90,7 +90,7 @@ mod tests {
             vec![11, 17, 18, 19, 20],
             vec![10, 9, 8, 7, 6],
         ];
-        let mut swimmer = Swimmer::new(input);
+        let swimmer = Swimmer::new(input);
         let output = swimmer.swim_in_water();
         assert_eq!(output, 16);
     }
@@ -103,7 +103,7 @@ mod tests {
             vec![1, 7, 13, 8],
             vec![2, 0, 15, 14],
         ];
-        let mut swimmer = Swimmer::new(input);
+        let swimmer = Swimmer::new(input);
         let output = swimmer.swim_in_water();
         assert_eq!(output, 14);
     }
@@ -117,7 +117,7 @@ mod tests {
             vec![11, 17, 18, 19, 20],
             vec![10, 9, 8, 7, 6],
         ];
-        let mut swimmer = Swimmer::new(input);
+        let swimmer = Swimmer::new(input);
         let output = swimmer.swim_in_water();
         assert_eq!(output, 16);
     }
@@ -130,7 +130,7 @@ mod tests {
             vec![1, 7, 13, 8],
             vec![2, 0, 15, 14],
         ];
-        let mut swimmer = Swimmer::new(input);
+        let swimmer = Swimmer::new(input);
         let output = swimmer.swim_in_water();
         assert_eq!(output, 14);
     }
